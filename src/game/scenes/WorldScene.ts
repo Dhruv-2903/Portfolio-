@@ -3,6 +3,12 @@ import Phaser from 'phaser';
 export class WorldScene extends Phaser.Scene {
   private groundTile!: Phaser.GameObjects.TileSprite;
   public buildings: Phaser.GameObjects.Sprite[] = [];
+  public player!: Phaser.Physics.Arcade.Sprite;
+
+  private keyLeft?: Phaser.Input.Keyboard.Key;
+  private keyRight?: Phaser.Input.Keyboard.Key;
+  private keyA?: Phaser.Input.Keyboard.Key;
+  private keyD?: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super('WorldScene');
@@ -39,10 +45,6 @@ export class WorldScene extends Phaser.Scene {
     this.groundTile = this.add.tileSprite(0, groundY, worldWidth, groundHeight, 'ground');
     this.groundTile.setOrigin(0, 0);
 
-    // Add ground physics body if needed
-    const groundGroup = this.physics.add.staticGroup();
-    groundGroup.add(this.groundTile);
-
     // Building definitions: exact left-to-right order (About, Skills, Projects, Contact)
     const buildingConfigs = [
       { key: 'building-about', name: 'About', x: 450 },
@@ -75,11 +77,66 @@ export class WorldScene extends Phaser.Scene {
       return sprite;
     });
 
-    // Simple camera setup (enable cursor key panning or initial camera position)
-    this.cameras.main.scrollX = 0;
+    // Define player animations
+    if (!this.anims.exists('walk')) {
+      this.anims.create({
+        key: 'walk',
+        frames: this.anims.generateFrameNumbers('player', { start: 143, end: 151 }),
+        frameRate: 12,
+        repeat: -1
+      });
+    }
+
+    if (!this.anims.exists('idle')) {
+      this.anims.create({
+        key: 'idle',
+        frames: this.anims.generateFrameNumbers('player', { start: 325, end: 326 }),
+        frameRate: 2,
+        repeat: -1
+      });
+    }
+
+    // Create physics-enabled player sprite sitting flush on top of the ground strip at x: 100
+    this.player = this.physics.add.sprite(100, groundY, 'player');
+    this.player.setOrigin(0.5, 1);
+    this.player.setCollideWorldBounds(true);
+    if (this.player.body) {
+      (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    }
+    this.player.play('idle');
+
+    // Register input controls (Left/Right Arrow keys AND A/D keys)
+    if (this.input.keyboard) {
+      this.keyLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+      this.keyRight = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+      this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+      this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    }
+
+    // Set camera to follow player horizontally only
+    this.cameras.main.startFollow(this.player, true, 0.1, 0);
   }
 
   update() {
-    // Optional scene tick updates
+    if (!this.player || !this.player.body) return;
+
+    const isLeft = (this.keyLeft && this.keyLeft.isDown) || (this.keyA && this.keyA.isDown);
+    const isRight = (this.keyRight && this.keyRight.isDown) || (this.keyD && this.keyD.isDown);
+
+    if (isLeft && !isRight) {
+      this.player.setVelocityX(-120);
+      this.player.setVelocityY(0);
+      this.player.setFlipX(true);
+      this.player.anims.play('walk', true);
+    } else if (isRight && !isLeft) {
+      this.player.setVelocityX(120);
+      this.player.setVelocityY(0);
+      this.player.setFlipX(false);
+      this.player.anims.play('walk', true);
+    } else {
+      this.player.setVelocityX(0);
+      this.player.setVelocityY(0);
+      this.player.anims.play('idle', true);
+    }
   }
 }
