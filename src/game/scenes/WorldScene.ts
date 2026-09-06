@@ -4,11 +4,13 @@ export class WorldScene extends Phaser.Scene {
   private groundTile!: Phaser.GameObjects.TileSprite;
   public buildings: Phaser.GameObjects.Sprite[] = [];
   public player!: Phaser.Physics.Arcade.Sprite;
+  private buildingGroup!: Phaser.Physics.Arcade.StaticGroup;
 
   private keyLeft?: Phaser.Input.Keyboard.Key;
   private keyRight?: Phaser.Input.Keyboard.Key;
   private keyA?: Phaser.Input.Keyboard.Key;
   private keyD?: Phaser.Input.Keyboard.Key;
+  private keyC?: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super('WorldScene');
@@ -27,14 +29,14 @@ export class WorldScene extends Phaser.Scene {
     graphics.fillGradientStyle(0x0f0c29, 0x0f0c29, 0x24243e, 0x302b63, 1);
     graphics.fillRect(0, 0, worldWidth, worldHeight);
 
-    // Add some subtle pixel stars in the background
+    // Add subtle pixel stars in background
     for (let i = 0; i < 150; i++) {
       const x = Phaser.Math.Between(0, worldWidth);
       const y = Phaser.Math.Between(10, worldHeight - 50);
       const alpha = Phaser.Math.FloatBetween(0.3, 0.9);
       const size = Phaser.Math.Between(1, 2);
       const star = this.add.rectangle(x, y, size, size, 0xffffff, alpha);
-      star.setScrollFactor(0.8); // Parallax depth effect
+      star.setScrollFactor(0.8);
     }
 
     // Top edge line of ground
@@ -44,6 +46,9 @@ export class WorldScene extends Phaser.Scene {
     // Repeating ground tile stretched across full strip width
     this.groundTile = this.add.tileSprite(0, groundY, worldWidth, groundHeight, 'ground');
     this.groundTile.setOrigin(0, 0);
+
+    // Static physics group for building footprint colliders
+    this.buildingGroup = this.physics.add.staticGroup();
 
     // Building definitions: exact left-to-right order (About, Skills, Projects, Contact)
     const buildingConfigs = [
@@ -73,6 +78,16 @@ export class WorldScene extends Phaser.Scene {
         padding: { x: 6, y: 3 }
       });
       label.setOrigin(0.5, 0.5);
+
+      // Create an invisible static collider footprint around the building doorway/bottom structure
+      const displayWidth = sprite.displayWidth;
+      const colliderWidth = displayWidth * 0.55; // Footprint width around entrance
+      const colliderHeight = 50; // Footprint height
+      const colliderY = groundY - (colliderHeight / 2);
+
+      const zone = this.add.rectangle(cfg.x, colliderY, colliderWidth, colliderHeight);
+      zone.setVisible(false);
+      this.buildingGroup.add(zone);
 
       return sprite;
     });
@@ -105,12 +120,25 @@ export class WorldScene extends Phaser.Scene {
     }
     this.player.play('idle');
 
+    // Add physics collider between player and static building group
+    this.physics.add.collider(this.player, this.buildingGroup);
+
     // Register input controls (Left/Right Arrow keys AND A/D keys)
     if (this.input.keyboard) {
       this.keyLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
       this.keyRight = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
       this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
       this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+      // Register 'C' key for physics debug render toggle
+      this.keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
+      this.keyC.on('down', () => {
+        const world = this.physics.world;
+        world.drawDebug = !world.drawDebug;
+        if (!world.drawDebug && world.debugGraphic) {
+          world.debugGraphic.clear();
+        }
+      });
     }
 
     // Set camera to follow player horizontally only
