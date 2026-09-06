@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { EventBus } from '../EventBus';
 
 export class WorldScene extends Phaser.Scene {
   private groundTile!: Phaser.GameObjects.TileSprite;
@@ -6,11 +7,18 @@ export class WorldScene extends Phaser.Scene {
   public player!: Phaser.Physics.Arcade.Sprite;
   private buildingGroup!: Phaser.Physics.Arcade.StaticGroup;
 
+  private interactionZones: { id: string; zone: Phaser.GameObjects.Zone }[] = [];
+  private activeBuildingId: string | null = null;
+  private promptText!: Phaser.GameObjects.Text;
+  private isPanelOpen: boolean = false;
+
   private keyLeft?: Phaser.Input.Keyboard.Key;
   private keyRight?: Phaser.Input.Keyboard.Key;
   private keyA?: Phaser.Input.Keyboard.Key;
   private keyD?: Phaser.Input.Keyboard.Key;
   private keyC?: Phaser.Input.Keyboard.Key;
+  private keyE?: Phaser.Input.Keyboard.Key;
+  private keyEnter?: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super('WorldScene');
@@ -52,10 +60,10 @@ export class WorldScene extends Phaser.Scene {
 
     // Building definitions: exact left-to-right order (About, Skills, Projects, Contact)
     const buildingConfigs = [
-      { key: 'building-about', name: 'About', x: 450 },
-      { key: 'building-skills', name: 'Skills', x: 1150 },
-      { key: 'building-projects', name: 'Projects', x: 1850 },
-      { key: 'building-contact', name: 'Contact', x: 2550 }
+      { id: 'about', key: 'building-about', name: 'About', x: 450 },
+      { id: 'skills', key: 'building-skills', name: 'Skills', x: 1150 },
+      { id: 'projects', key: 'building-projects', name: 'Projects', x: 1850 },
+      { id: 'contact', key: 'building-contact', name: 'Contact', x: 2550 }
     ];
 
     const targetHeight = 145; // Target display height for buildings
@@ -89,8 +97,24 @@ export class WorldScene extends Phaser.Scene {
       zone.setVisible(false);
       this.buildingGroup.add(zone);
 
+      // Create invisible interaction overlap zone in front of doorway
+      const interactZone = this.add.zone(cfg.x, groundY - 30, colliderWidth + 30, 60);
+      this.physics.add.existing(interactZone, true);
+      this.interactionZones.push({ id: cfg.id, zone: interactZone });
+
       return sprite;
     });
+
+    // Floating "Press E" prompt text above player's head
+    this.promptText = this.add.text(0, 0, 'PRESS E TO ENTER', {
+      font: 'bold 10px "Courier New", Courier, monospace',
+      color: '#ffffff',
+      backgroundColor: '#ff2a6d',
+      padding: { x: 6, y: 3 }
+    });
+    this.promptText.setOrigin(0.5, 1);
+    this.promptText.setDepth(100);
+    this.promptText.setVisible(false);
 
     // Define player animations
     if (!this.anims.exists('walk')) {
@@ -123,7 +147,14 @@ export class WorldScene extends Phaser.Scene {
     // Add physics collider between player and static building group
     this.physics.add.collider(this.player, this.buildingGroup);
 
-    // Register input controls (Left/Right Arrow keys AND A/D keys)
+    // Register overlap listeners for interaction zones
+    this.interactionZones.forEach(({ id, zone }) => {
+      this.physics.add.overlap(this.player, zone, () => {
+        this.activeBuildingId = id;
+      });
+    });
+
+    // Register input controls
     if (this.input.keyboard) {
       this.keyLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
       this.keyRight = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
@@ -139,7 +170,34 @@ export class WorldScene extends Phaser.Scene {
           world.debugGraphic.clear();
         }
       });
+
+      // Register E and Enter key for building interaction
+      this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+      this.keyEnter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+
+      const triggerBuildingEnter = () => {
+        if (this.activeBuildingId && !this.isPanelOpen) {
+          this.isPanelOpen = true;
+          this.promptText.setVisible(false);
+          this.player.setVelocity(0, 0);
+          this.player.anims.play('idle', true);
+          EventBus.emit('building-entered', this.activeBuildingId);
+        }
+      };
+
+      this.keyE.on('down', triggerBuildingEnter);
+      this.keyEnter.on('down', triggerBuildingEnter);
     }
+
+    // Listen for panel-closed event to resume player controls
+    const onPanelClosed = () => {
+      this.isPanelOpen = false;
+    };
+    EventBus.on('panel-closed', onPanelClosed);
+
+    this.events.once('shutdown', () => {
+      EventBus.off('panel-closed', onPanelClosed);
+    });
 
     // Set camera to follow player horizontally only
     this.cameras.main.startFollow(this.player, true, 0.1, 0);
@@ -147,6 +205,33 @@ export class WorldScene extends Phaser.Scene {
 
   update() {
     if (!this.player || !this.player.body) return;
+
+    // Reset active building detection every frame before physics overlap resolves
+    let currentActiveZone: string | null = null;
+
+    // Check overlaps manually or via body overlap test
+    for (const { id, zone } of this.interactionZones) {
+      if (this.physics.overlap(this.player, zone)) {
+        currentActiveZone = id;
+        break;
+      }
+    }
+    this.activeBuildingId = currentActiveZone;
+
+    // Control floating prompt UI above player head
+    if (this.activeBuildingId && !this.isPanelOpen) {
+      this.promptText.setPosition(this.player.x, this.player.y - 66);
+      this.promptText.setVisible(true);
+    } else {
+      this.promptText.setVisible(false);
+    }
+
+    // Freeze player input if building panel is currently open
+    if (this.isPanelOpen) {
+      this.player.setVelocity(0, 0);
+      this.player.anims.play('idle', true);
+      return;
+    }
 
     const isLeft = (this.keyLeft && this.keyLeft.isDown) || (this.keyA && this.keyA.isDown);
     const isRight = (this.keyRight && this.keyRight.isDown) || (this.keyD && this.keyD.isDown);
