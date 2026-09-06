@@ -55,7 +55,7 @@ export class WorldScene extends Phaser.Scene {
     this.groundTile = this.add.tileSprite(0, groundY, worldWidth, groundHeight, 'ground');
     this.groundTile.setOrigin(0, 0);
 
-    // Static physics group for building footprint colliders
+    // Static physics group for building structural colliders
     this.buildingGroup = this.physics.add.staticGroup();
 
     // Building definitions: exact left-to-right order (About, Skills, Projects, Contact)
@@ -87,18 +87,19 @@ export class WorldScene extends Phaser.Scene {
       });
       label.setOrigin(0.5, 0.5);
 
-      // Create an invisible static collider footprint around the building doorway/bottom structure
+      // Create a narrower static collider on the building's main upper structure,
+      // keeping the ground walking pathway completely clear for smooth side-scrolling.
       const displayWidth = sprite.displayWidth;
-      const colliderWidth = displayWidth * 0.55; // Footprint width around entrance
-      const colliderHeight = 50; // Footprint height
-      const colliderY = groundY - (colliderHeight / 2);
+      const colliderWidth = displayWidth * 0.45; // Main mass collider width
+      const colliderHeight = 50;
+      const colliderY = groundY - 75; // Offset upward above walking floor
 
       const zone = this.add.rectangle(cfg.x, colliderY, colliderWidth, colliderHeight);
       zone.setVisible(false);
       this.buildingGroup.add(zone);
 
       // Create invisible interaction overlap zone in front of doorway
-      const interactZone = this.add.zone(cfg.x, groundY - 30, colliderWidth + 30, 60);
+      const interactZone = this.add.zone(cfg.x, groundY - 30, colliderWidth + 40, 60);
       this.physics.add.existing(interactZone, true);
       this.interactionZones.push({ id: cfg.id, zone: interactZone });
 
@@ -141,6 +142,8 @@ export class WorldScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     if (this.player.body) {
       (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+      (this.player.body as Phaser.Physics.Arcade.Body).setSize(32, 48);
+      (this.player.body as Phaser.Physics.Arcade.Body).setOffset(16, 16);
     }
     this.player.play('idle');
 
@@ -163,13 +166,14 @@ export class WorldScene extends Phaser.Scene {
 
       // Register 'C' key for physics debug render toggle
       this.keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
-      this.keyC.on('down', () => {
+      const toggleDebug = () => {
         const world = this.physics.world;
         world.drawDebug = !world.drawDebug;
         if (!world.drawDebug && world.debugGraphic) {
           world.debugGraphic.clear();
         }
-      });
+      };
+      this.keyC.on('down', toggleDebug);
 
       // Register E and Enter key for building interaction
       this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
