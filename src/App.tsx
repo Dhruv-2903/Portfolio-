@@ -5,6 +5,7 @@ import { AboutPanel } from './components/AboutPanel';
 import { SkillsPanel } from './components/SkillsPanel';
 import { ProjectsPanel } from './components/ProjectsPanel';
 import { ContactPanel } from './components/ContactPanel';
+import { TouchControls } from './components/TouchControls';
 import './App.css';
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
       </header>
       <main className="game-wrapper">
         <PhaserGame />
+        <TouchControls />
         {renderActivePanel()}
       </main>
     </div>

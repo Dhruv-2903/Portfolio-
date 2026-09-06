@@ -49,6 +49,69 @@
   display: block;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: -moz-crisp-edges;
+}
+
+/* Touch Controls Overlay & Buttons */
+.touch-controls-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0.75rem 1rem;
+  z-index: 500;
+  box-sizing: border-box;
+}
+
+.dpad-container,
+.action-container {
+  display: flex;
+  gap: 0.6rem;
+  pointer-events: auto;
+}
+
+.touch-btn {
+  background: rgba(18, 18, 36, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: background 0.1s, transform 0.05s;
+}
+
+.touch-btn:active {
+  background: rgba(255, 42, 109, 0.85);
+  border-color: #ffffff;
+  transform: scale(0.92);
+}
+
+.dpad-btn {
+  width: 48px;
+  height: 48px;
+}
+
+.action-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 42, 109, 0.75);
+  border-color: rgba(255, 221, 85, 0.9);
+  color: #ffdd55;
+  font-size: 1.2rem;
+  text-shadow: 1px 1px 0px #000;
 }
 
 /* Modal Overlay & Retro Pixel Styling */

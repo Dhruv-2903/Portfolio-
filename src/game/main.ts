@@ -8,6 +8,7 @@ export const config: Phaser.Types.Core.GameConfig = {
   height: 270,
   parent: 'game-container',
   pixelArt: true,
+  roundPixels: true,
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH

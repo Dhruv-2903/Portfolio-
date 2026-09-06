@@ -12,6 +12,9 @@ export class WorldScene extends Phaser.Scene {
   private promptText!: Phaser.GameObjects.Text;
   private isPanelOpen: boolean = false;
 
+  private isTouchLeftDown: boolean = false;
+  private isTouchRightDown: boolean = false;
+
   private keyLeft?: Phaser.Input.Keyboard.Key;
   private keyRight?: Phaser.Input.Keyboard.Key;
   private keyA?: Phaser.Input.Keyboard.Key;
@@ -157,6 +160,17 @@ export class WorldScene extends Phaser.Scene {
       });
     });
 
+    // Interaction trigger function
+    const triggerBuildingEnter = () => {
+      if (this.activeBuildingId && !this.isPanelOpen) {
+        this.isPanelOpen = true;
+        this.promptText.setVisible(false);
+        this.player.setVelocity(0, 0);
+        this.player.anims.play('idle', true);
+        EventBus.emit('building-entered', this.activeBuildingId);
+      }
+    };
+
     // Register input controls
     if (this.input.keyboard) {
       this.keyLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
@@ -179,27 +193,36 @@ export class WorldScene extends Phaser.Scene {
       this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
       this.keyEnter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
-      const triggerBuildingEnter = () => {
-        if (this.activeBuildingId && !this.isPanelOpen) {
-          this.isPanelOpen = true;
-          this.promptText.setVisible(false);
-          this.player.setVelocity(0, 0);
-          this.player.anims.play('idle', true);
-          EventBus.emit('building-entered', this.activeBuildingId);
-        }
-      };
-
       this.keyE.on('down', triggerBuildingEnter);
       this.keyEnter.on('down', triggerBuildingEnter);
     }
 
+    // Touch control EventBus listeners
+    const onMoveLeftStart = () => { this.isTouchLeftDown = true; };
+    const onMoveLeftStop = () => { this.isTouchLeftDown = false; };
+    const onMoveRightStart = () => { this.isTouchRightDown = true; };
+    const onMoveRightStop = () => { this.isTouchRightDown = false; };
+
+    EventBus.on('move-left-start', onMoveLeftStart);
+    EventBus.on('move-left-stop', onMoveLeftStop);
+    EventBus.on('move-right-start', onMoveRightStart);
+    EventBus.on('move-right-stop', onMoveRightStop);
+    EventBus.on('interact-trigger', triggerBuildingEnter);
+
     // Listen for panel-closed event to resume player controls
     const onPanelClosed = () => {
       this.isPanelOpen = false;
+      this.isTouchLeftDown = false;
+      this.isTouchRightDown = false;
     };
     EventBus.on('panel-closed', onPanelClosed);
 
     this.events.once('shutdown', () => {
+      EventBus.off('move-left-start', onMoveLeftStart);
+      EventBus.off('move-left-stop', onMoveLeftStop);
+      EventBus.off('move-right-start', onMoveRightStart);
+      EventBus.off('move-right-stop', onMoveRightStop);
+      EventBus.off('interact-trigger', triggerBuildingEnter);
       EventBus.off('panel-closed', onPanelClosed);
     });
 
@@ -237,8 +260,8 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    const isLeft = (this.keyLeft && this.keyLeft.isDown) || (this.keyA && this.keyA.isDown);
-    const isRight = (this.keyRight && this.keyRight.isDown) || (this.keyD && this.keyD.isDown);
+    const isLeft = (this.keyLeft && this.keyLeft.isDown) || (this.keyA && this.keyA.isDown) || this.isTouchLeftDown;
+    const isRight = (this.keyRight && this.keyRight.isDown) || (this.keyD && this.keyD.isDown) || this.isTouchRightDown;
 
     if (isLeft && !isRight) {
       this.player.setVelocityX(-120);
