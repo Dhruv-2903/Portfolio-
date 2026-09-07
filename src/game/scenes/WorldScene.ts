@@ -21,6 +21,9 @@ export class WorldScene extends Phaser.Scene {
   private keyRight?: Phaser.Input.Keyboard.Key;
   private keyA?: Phaser.Input.Keyboard.Key;
   private keyD?: Phaser.Input.Keyboard.Key;
+  private keySpace?: Phaser.Input.Keyboard.Key;
+  private keyUp?: Phaser.Input.Keyboard.Key;
+  private keyW?: Phaser.Input.Keyboard.Key;
   private keyC?: Phaser.Input.Keyboard.Key;
   private keyE?: Phaser.Input.Keyboard.Key;
   private keyEnter?: Phaser.Input.Keyboard.Key;
@@ -63,6 +66,10 @@ export class WorldScene extends Phaser.Scene {
     // Repeating ground tile stretched across full strip width
     this.groundTile = this.add.tileSprite(0, groundY, worldWidth, groundHeight, 'ground');
     this.groundTile.setOrigin(0, 0);
+
+    // Create a static physics body for the ground strip so player lands on top of groundY
+    const groundBody = this.add.rectangle(worldWidth / 2, groundY + groundHeight / 2, worldWidth, groundHeight);
+    this.physics.add.existing(groundBody, true);
 
     // Static physics group for building structural colliders
     this.buildingGroup = this.physics.add.staticGroup();
@@ -138,6 +145,15 @@ export class WorldScene extends Phaser.Scene {
       });
     }
 
+    if (!this.anims.exists('jump')) {
+      this.anims.create({
+        key: 'jump',
+        frames: this.anims.generateFrameNumbers('player', { start: 377, end: 381 }),
+        frameRate: 10,
+        repeat: 0
+      });
+    }
+
     // Determine starting position: spawn near building doorway if specified, else default start position
     const startX = getSpawnX(this.spawnNear);
 
@@ -146,13 +162,13 @@ export class WorldScene extends Phaser.Scene {
     this.player.setOrigin(0.5, 1);
     this.player.setCollideWorldBounds(true);
     if (this.player.body) {
-      (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
       (this.player.body as Phaser.Physics.Arcade.Body).setSize(32, 48);
       (this.player.body as Phaser.Physics.Arcade.Body).setOffset(16, 16);
     }
     this.player.play('idle');
 
-    // Add physics collider between player and static building group
+    // Add physics colliders for ground and building structural colliders
+    this.physics.add.collider(this.player, groundBody);
     this.physics.add.collider(this.player, this.buildingGroup);
 
     // Register overlap listeners for interaction zones
@@ -173,12 +189,31 @@ export class WorldScene extends Phaser.Scene {
       }
     };
 
+    // Jump trigger function
+    const triggerJump = () => {
+      if (!this.player || !this.player.body || this.isPanelOpen) return;
+      const isGrounded = this.player.body.blocked.down || this.player.body.touching.down;
+      if (isGrounded) {
+        this.player.setVelocityY(-350);
+        this.player.anims.play('jump', true);
+      }
+    };
+
     // Register input controls
     if (this.input.keyboard) {
       this.keyLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
       this.keyRight = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
       this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
       this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+      // Jump keys: Space, Up Arrow, W key
+      this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+      this.keyUp = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+      this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+
+      this.keySpace.on('down', triggerJump);
+      this.keyUp.on('down', triggerJump);
+      this.keyW.on('down', triggerJump);
 
       // Register 'C' key for physics debug render toggle
       this.keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
@@ -210,6 +245,7 @@ export class WorldScene extends Phaser.Scene {
     EventBus.on('move-right-start', onMoveRightStart);
     EventBus.on('move-right-stop', onMoveRightStop);
     EventBus.on('interact-trigger', triggerBuildingEnter);
+    EventBus.on('jump-trigger', triggerJump);
 
     // Listen for panel-closed event to resume player controls
     const onPanelClosed = () => {
@@ -225,6 +261,7 @@ export class WorldScene extends Phaser.Scene {
       EventBus.off('move-right-start', onMoveRightStart);
       EventBus.off('move-right-stop', onMoveRightStop);
       EventBus.off('interact-trigger', triggerBuildingEnter);
+      EventBus.off('jump-trigger', triggerJump);
       EventBus.off('panel-closed', onPanelClosed);
     });
 
@@ -262,23 +299,30 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
+    const isGrounded = this.player.body.blocked.down || this.player.body.touching.down;
+
     const isLeft = (this.keyLeft && this.keyLeft.isDown) || (this.keyA && this.keyA.isDown) || this.isTouchLeftDown;
     const isRight = (this.keyRight && this.keyRight.isDown) || (this.keyD && this.keyD.isDown) || this.isTouchRightDown;
 
     if (isLeft && !isRight) {
       this.player.setVelocityX(-120);
-      this.player.setVelocityY(0);
       this.player.setFlipX(true);
-      this.player.anims.play('walk', true);
     } else if (isRight && !isLeft) {
       this.player.setVelocityX(120);
-      this.player.setVelocityY(0);
       this.player.setFlipX(false);
-      this.player.anims.play('walk', true);
     } else {
       this.player.setVelocityX(0);
-      this.player.setVelocityY(0);
-      this.player.anims.play('idle', true);
+    }
+
+    // Animation state management: play jump when airborne, walk/idle when grounded
+    if (!isGrounded) {
+      this.player.anims.play('jump', true);
+    } else {
+      if (isLeft || isRight) {
+        this.player.anims.play('walk', true);
+      } else {
+        this.player.anims.play('idle', true);
+      }
     }
   }
 }

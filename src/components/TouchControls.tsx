@@ -33,6 +33,11 @@ export const TouchControls: React.FC = () => {
     EventBus.emit('move-right-stop');
   };
 
+  const handleJump = (e: React.TouchEvent | React.MouseEvent) => {
+    e.preventDefault();
+    EventBus.emit('jump-trigger');
+  };
+
   const handleInteract = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
     EventBus.emit('interact-trigger');
@@ -64,6 +69,14 @@ export const TouchControls: React.FC = () => {
       </div>
 
       <div className="action-container">
+        <button
+          className="touch-btn action-btn jump-btn"
+          onTouchStart={handleJump}
+          onMouseDown={handleJump}
+          aria-label="Jump"
+        >
+          ▲
+        </button>
         <button
           className="touch-btn action-btn"
           onTouchStart={handleInteract}
