@@ -22,6 +22,13 @@ export const BUILDING_POSITIONS: Record<string, number> = BUILDING_CONFIGS.reduc
   {} as Record<string, number>
 );
 
+export const BUILDING_ELEVATIONS: Record<string, number> = {
+  about: 0,
+  skills: 60,
+  projects: 120,
+  contact: 50
+};
+
 /**
  * Returns player starting x coordinate.
  * If buildingId is specified, spawns player just outside that building's doorway (offset by -30px).
@@ -33,3 +40,14 @@ export const getSpawnX = (buildingId?: string): number => {
   }
   return DEFAULT_PLAYER_SPAWN_X;
 };
+
+/**
+ * Returns player starting y coordinate matching elevated platform base height.
+ */
+export const getSpawnY = (groundY: number, buildingId?: string): number => {
+  if (buildingId && BUILDING_ELEVATIONS[buildingId] !== undefined) {
+    return groundY - BUILDING_ELEVATIONS[buildingId];
+  }
+  return groundY;
+};
+

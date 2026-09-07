@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { EventBus } from '../EventBus';
-import { BUILDING_CONFIGS, getSpawnX } from '../buildingPositions';
+import { BUILDING_CONFIGS, BUILDING_ELEVATIONS, getSpawnX, getSpawnY } from '../buildingPositions';
 
 export class WorldScene extends Phaser.Scene {
   private groundTile!: Phaser.GameObjects.TileSprite;
@@ -39,20 +39,22 @@ export class WorldScene extends Phaser.Scene {
   create() {
     const worldWidth = 3200;
     const worldHeight = 270;
+    const minY = -250;
+    const totalHeight = worldHeight - minY;
 
-    // Set camera and world bounds for side-scrolling
-    this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
-    this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
+    // Set camera and world bounds expanded vertically to handle platform jumps
+    this.cameras.main.setBounds(0, minY, worldWidth, totalHeight);
+    this.physics.world.setBounds(0, minY, worldWidth, totalHeight);
 
-    // Sky / Background gradient fill
+    // Sky / Background gradient fill covering entire expanded vertical range
     const graphics = this.add.graphics();
     graphics.fillGradientStyle(0x0f0c29, 0x0f0c29, 0x24243e, 0x302b63, 1);
-    graphics.fillRect(0, 0, worldWidth, worldHeight);
+    graphics.fillRect(0, minY, worldWidth, totalHeight);
 
-    // Add subtle pixel stars in background
-    for (let i = 0; i < 150; i++) {
+    // Add subtle pixel stars in background across expanded vertical height
+    for (let i = 0; i < 200; i++) {
       const x = Phaser.Math.Between(0, worldWidth);
-      const y = Phaser.Math.Between(10, worldHeight - 50);
+      const y = Phaser.Math.Between(minY + 20, worldHeight - 50);
       const alpha = Phaser.Math.FloatBetween(0.3, 0.9);
       const size = Phaser.Math.Between(1, 2);
       const star = this.add.rectangle(x, y, size, size, 0xffffff, alpha);
@@ -78,8 +80,11 @@ export class WorldScene extends Phaser.Scene {
     const targetHeight = 145; // Target display height for buildings
 
     this.buildings = BUILDING_CONFIGS.map((cfg) => {
-      // Set origin (0.5, 1) so building bottom edge snaps directly to the ground top line (groundY)
-      const sprite = this.add.sprite(cfg.x, groundY, cfg.key);
+      const elevation = BUILDING_ELEVATIONS[cfg.id] || 0;
+      const buildingBaseY = groundY - elevation;
+
+      // Set origin (0.5, 1) so building bottom edge snaps directly to its platform surface
+      const sprite = this.add.sprite(cfg.x, buildingBaseY, cfg.key);
       sprite.setOrigin(0.5, 1);
 
       // Scale building to maintain consistent proportion with 270px viewport height
@@ -87,7 +92,7 @@ export class WorldScene extends Phaser.Scene {
       sprite.setScale(scale);
 
       // Add label banner above building
-      const labelY = groundY - (sprite.height * scale) - 12;
+      const labelY = buildingBaseY - (sprite.height * scale) - 12;
       const label = this.add.text(cfg.x, labelY, cfg.name.toUpperCase(), {
         font: 'bold 11px "Courier New", Courier, monospace',
         color: '#ffdd55',
@@ -96,19 +101,18 @@ export class WorldScene extends Phaser.Scene {
       });
       label.setOrigin(0.5, 0.5);
 
-      // Create a narrower static collider on the building's main upper structure,
-      // keeping the ground walking pathway completely clear for smooth side-scrolling.
+      // Create a narrower static collider on the building's main upper structure
       const displayWidth = sprite.displayWidth;
       const colliderWidth = displayWidth * 0.45; // Main mass collider width
       const colliderHeight = 50;
-      const colliderY = groundY - 75; // Offset upward above walking floor
+      const colliderY = buildingBaseY - 75; // Offset upward above walking floor
 
       const zone = this.add.rectangle(cfg.x, colliderY, colliderWidth, colliderHeight);
       zone.setVisible(false);
       this.buildingGroup.add(zone);
 
-      // Create invisible interaction overlap zone in front of doorway
-      const interactZone = this.add.zone(cfg.x, groundY - 30, colliderWidth + 40, 60);
+      // Create invisible interaction overlap zone in front of doorway at proper elevation
+      const interactZone = this.add.zone(cfg.x, buildingBaseY - 30, colliderWidth + 40, 60);
       this.physics.add.existing(interactZone, true);
       this.interactionZones.push({ id: cfg.id, zone: interactZone });
 
@@ -159,9 +163,10 @@ export class WorldScene extends Phaser.Scene {
 
     // Determine starting position: spawn near building doorway if specified, else default start position
     const startX = getSpawnX(this.spawnNear);
+    const startY = getSpawnY(groundY, this.spawnNear);
 
-    // Create physics-enabled player sprite sitting flush on top of the ground strip
-    this.player = this.physics.add.sprite(startX, groundY, 'player');
+    // Create physics-enabled player sprite sitting flush on top of the ground/platform strip
+    this.player = this.physics.add.sprite(startX, startY, 'player');
     this.player.setOrigin(0.5, 1);
     this.player.setCollideWorldBounds(true);
     if (this.player.body) {
@@ -169,6 +174,7 @@ export class WorldScene extends Phaser.Scene {
       (this.player.body as Phaser.Physics.Arcade.Body).setOffset(16, 16);
     }
     this.player.play('idle');
+
 
     // Add physics colliders for ground and building structural colliders
     this.physics.add.collider(this.player, groundBody);
@@ -268,8 +274,9 @@ export class WorldScene extends Phaser.Scene {
       EventBus.off('panel-closed', onPanelClosed);
     });
 
-    // Set camera to follow player horizontally only
-    this.cameras.main.startFollow(this.player, true, 0.1, 0);
+    // Set camera to follow player on both X and Y axes smoothly
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+
   }
 
   update() {
