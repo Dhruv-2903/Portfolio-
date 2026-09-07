@@ -115,6 +115,9 @@ export class WorldScene extends Phaser.Scene {
       return sprite;
     });
 
+    // Create static platform blocks and staircases using existing terrain 'ground' tiles
+    this.createPlatforms(groundY);
+
     // Floating "Press E" prompt text above player's head
     this.promptText = this.add.text(0, 0, 'PRESS E TO ENTER', {
       font: 'bold 10px "Courier New", Courier, monospace',
@@ -325,4 +328,30 @@ export class WorldScene extends Phaser.Scene {
       }
     }
   }
+
+  private createPlatform(x: number, topY: number, width: number, height: number = 16) {
+    const platformTile = this.add.tileSprite(x, topY, width, height, 'ground');
+    platformTile.setOrigin(0.5, 0);
+
+    const platformBody = this.add.rectangle(x, topY + height / 2, width, height);
+    platformBody.setVisible(false);
+    this.physics.add.existing(platformBody, true);
+    this.buildingGroup.add(platformBody);
+  }
+
+  private createPlatforms(groundY: number) {
+    // 2-step staircase leading up to Skills (building at x = 1150, height ~60px above ground)
+    this.createPlatform(1030, groundY - 30, 60, 30);
+    this.createPlatform(1110, groundY - 60, 100, 60);
+
+    // 3-step ascending jump-chain leading up to Projects (building at x = 1850, height ~120px above ground)
+    this.createPlatform(1670, groundY - 40, 50, 16);
+    this.createPlatform(1740, groundY - 80, 50, 16);
+    this.createPlatform(1830, groundY - 120, 90, 16);
+
+    // 2-step staircase leading down/up to Contact (building at x = 2550, height ~50px above ground)
+    this.createPlatform(2450, groundY - 25, 60, 25);
+    this.createPlatform(2530, groundY - 50, 90, 50);
+  }
 }
+
