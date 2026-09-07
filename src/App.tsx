@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import QuickNav from './components/QuickNav';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import SkillsPage from './pages/SkillsPage';
@@ -9,6 +10,7 @@ import './App.css';
 function App() {
   return (
     <BrowserRouter>
+      <QuickNav />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />

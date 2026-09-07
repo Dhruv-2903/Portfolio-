@@ -1,0 +1,125 @@
+.quick-nav-container {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 1500;
+  font-family: 'Courier New', Courier, monospace;
+  opacity: 0.85;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.quick-nav-container:hover {
+  opacity: 1;
+}
+
+.quick-nav-toggle {
+  display: none;
+  background: rgba(18, 18, 36, 0.9);
+  color: #ffdd55;
+  border: 2px solid #5555aa;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  user-select: none;
+}
+
+.quick-nav-toggle:hover {
+  border-color: #00fff5;
+  color: #ffffff;
+}
+
+.quick-nav-list {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 4px 8px;
+  background: rgba(18, 18, 36, 0.88);
+  border: 2px solid #333366;
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+}
+
+.quick-nav-item {
+  display: flex;
+  align-items: center;
+}
+
+.quick-nav-link {
+  color: #aaaaff;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  letter-spacing: 0.5px;
+}
+
+.quick-nav-link:hover {
+  color: #ffdd55;
+  background: rgba(255, 221, 85, 0.12);
+  border-color: rgba(255, 221, 85, 0.4);
+}
+
+.quick-nav-link.active {
+  color: #00fff5;
+  background: rgba(0, 255, 245, 0.15);
+  border-color: #00fff5;
+  text-shadow: 0 0 4px rgba(0, 255, 245, 0.5);
+}
+
+/* Mobile & Narrow Viewports */
+@media (max-width: 768px) {
+  .quick-nav-container {
+    opacity: 1;
+    top: 10px;
+    right: 12px;
+  }
+
+  .quick-nav-toggle {
+    display: block;
+  }
+
+  .quick-nav-list {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    min-width: 140px;
+    padding: 8px;
+    gap: 0.4rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
+  }
+
+  .quick-nav-list.open {
+    display: flex;
+    animation: quickNavSlideDown 0.15s ease-out;
+  }
+
+  .quick-nav-link {
+    display: block;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@keyframes quickNavSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
