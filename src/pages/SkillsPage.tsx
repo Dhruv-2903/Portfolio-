@@ -1,32 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { skillsData } from '../data/content';
+import SkillsBook from '../components/SkillsBook';
 
 export const SkillsPage: React.FC = () => {
   return (
-    <div className="page-container">
-      <div className="page-card">
-        <header className="page-header">
-          <h2>SKILLS & TECHNOLOGIES</h2>
-          <Link to="/" state={{ from: 'skills' }} className="back-btn">
-            ← BACK TO TOWN
-          </Link>
-        </header>
-        <main className="page-body">
-          {skillsData.map((categoryGroup, idx) => (
-            <div key={idx} className="skill-group">
-              <h4>{categoryGroup.category.toUpperCase()}</h4>
-              <div className="tags-container">
-                {categoryGroup.skills.map((skill, sIdx) => (
-                  <span key={sIdx} className="pixel-tag">
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </main>
-      </div>
+    <div className="page-container skills-page-container">
+      <header className="page-header nav-bar">
+        <h2>SKILLS DIRECTORY</h2>
+        <Link to="/" state={{ from: 'skills' }} className="back-btn">
+          ← BACK TO TOWN
+        </Link>
+      </header>
+      <main className="skills-book-main">
+        <SkillsBook />
+      </main>
     </div>
   );
 };

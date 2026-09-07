@@ -11,6 +11,12 @@ export interface SkillCategory {
   skills: string[];
 }
 
+export interface SkillPageData {
+  title: string;
+  description: string;
+  skills: string[];
+}
+
 export interface ProjectData {
   id: string;
   title: string;
@@ -51,6 +57,29 @@ export const skillsData: SkillCategory[] = [
   {
     category: "Tools & Infrastructure",
     skills: ["Git", "GitHub", "VS Code", "Vercel", "Docker", "Linux"]
+  }
+];
+
+export const skillsPages: SkillPageData[] = [
+  {
+    title: "Frontend Engineering",
+    description: "Building responsive, modern, and interactive user interfaces with cutting-edge web technologies.",
+    skills: ["React 19 & Hooks", "TypeScript", "HTML5 & Semantic Markup", "CSS3 & Retro Layouts", "Vite Ecosystem"]
+  },
+  {
+    title: "Backend & Cloud",
+    description: "Designing robust server-side architectures, RESTful APIs, and cloud infrastructure.",
+    skills: ["Node.js & Express", "Python Automation", "SQL & Database Systems", "RESTful API Design", "Docker Containers"]
+  },
+  {
+    title: "Game Dev & 2D Graphics",
+    description: "Crafting real-time side-scrolling mechanics, pixel-art renderers, and interactive web experiences.",
+    skills: ["Phaser 3 Engine", "Sprite Animations", "Arcade Physics World", "Tilemap Integration", "HTML5 Canvas API"]
+  },
+  {
+    title: "Tools & Problem Solving",
+    description: "Developer tooling, version control, workflow automation, and algorithmic mastery.",
+    skills: ["Git & GitHub Workflows", "Linux Shell & Scripting", "Competitive Programming (C++)", "VS Code Development", "Vercel Deployments"]
   }
 ];
 
