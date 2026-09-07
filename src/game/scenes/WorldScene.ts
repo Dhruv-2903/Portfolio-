@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { EventBus } from '../EventBus';
+import { BUILDING_CONFIGS, getSpawnX } from '../buildingPositions';
 
 export class WorldScene extends Phaser.Scene {
   private groundTile!: Phaser.GameObjects.TileSprite;
@@ -11,6 +12,7 @@ export class WorldScene extends Phaser.Scene {
   private activeBuildingId: string | null = null;
   private promptText!: Phaser.GameObjects.Text;
   private isPanelOpen: boolean = false;
+  private spawnNear?: string;
 
   private isTouchLeftDown: boolean = false;
   private isTouchRightDown: boolean = false;
@@ -25,6 +27,10 @@ export class WorldScene extends Phaser.Scene {
 
   constructor() {
     super('WorldScene');
+  }
+
+  init(data?: { spawnNear?: string }) {
+    this.spawnNear = data?.spawnNear || this.registry.get('spawnNear');
   }
 
   create() {
@@ -61,17 +67,10 @@ export class WorldScene extends Phaser.Scene {
     // Static physics group for building structural colliders
     this.buildingGroup = this.physics.add.staticGroup();
 
-    // Building definitions: exact left-to-right order (About, Skills, Projects, Contact)
-    const buildingConfigs = [
-      { id: 'about', key: 'building-about', name: 'About', x: 450 },
-      { id: 'skills', key: 'building-skills', name: 'Skills', x: 1150 },
-      { id: 'projects', key: 'building-projects', name: 'Projects', x: 1850 },
-      { id: 'contact', key: 'building-contact', name: 'Contact', x: 2550 }
-    ];
-
+    // Use single source of truth for building configurations
     const targetHeight = 145; // Target display height for buildings
 
-    this.buildings = buildingConfigs.map((cfg) => {
+    this.buildings = BUILDING_CONFIGS.map((cfg) => {
       // Set origin (0.5, 1) so building bottom edge snaps directly to the ground top line (groundY)
       const sprite = this.add.sprite(cfg.x, groundY, cfg.key);
       sprite.setOrigin(0.5, 1);
@@ -139,8 +138,11 @@ export class WorldScene extends Phaser.Scene {
       });
     }
 
-    // Create physics-enabled player sprite sitting flush on top of the ground strip at x: 100
-    this.player = this.physics.add.sprite(100, groundY, 'player');
+    // Determine starting position: spawn near building doorway if specified, else default start position
+    const startX = getSpawnX(this.spawnNear);
+
+    // Create physics-enabled player sprite sitting flush on top of the ground strip
+    this.player = this.physics.add.sprite(startX, groundY, 'player');
     this.player.setOrigin(0.5, 1);
     this.player.setCollideWorldBounds(true);
     if (this.player.body) {

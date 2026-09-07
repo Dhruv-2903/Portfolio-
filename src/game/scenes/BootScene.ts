@@ -1,8 +1,14 @@
 import Phaser from 'phaser';
 
 export class BootScene extends Phaser.Scene {
+  private spawnNear?: string;
+
   constructor() {
     super('BootScene');
+  }
+
+  init(data?: { spawnNear?: string }) {
+    this.spawnNear = data?.spawnNear || this.registry.get('spawnNear');
   }
 
   preload() {
@@ -52,7 +58,7 @@ export class BootScene extends Phaser.Scene {
       progressBox.destroy();
       loadingText.destroy();
       percentText.destroy();
-      this.scene.start('WorldScene');
+      this.scene.start('WorldScene', { spawnNear: this.spawnNear });
     });
 
     // Preload assets from /public/assets

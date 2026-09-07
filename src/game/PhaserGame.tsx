@@ -9,15 +9,16 @@ export interface PhaserGameRef {
 
 export interface IProps {
   currentActiveScene?: (scene_instance: Phaser.Scene) => void;
+  spawnNear?: string;
 }
 
-export const PhaserGame = ({ currentActiveScene }: IProps) => {
+export const PhaserGame = ({ currentActiveScene, spawnNear }: IProps) => {
   const gameRef = useRef<Phaser.Game | null>(null);
 
   useEffect(() => {
     // Guard against React 18/19 StrictMode double-mounting
     if (gameRef.current === null) {
-      gameRef.current = StartGame('game-container');
+      gameRef.current = StartGame('game-container', { spawnNear });
 
       if (currentActiveScene) {
         EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) => {
@@ -33,7 +34,7 @@ export const PhaserGame = ({ currentActiveScene }: IProps) => {
       }
       EventBus.removeListener('current-scene-ready');
     };
-  }, [currentActiveScene]);
+  }, [currentActiveScene, spawnNear]);
 
   return (
     <div

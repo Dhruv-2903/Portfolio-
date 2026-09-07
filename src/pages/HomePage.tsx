@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { PhaserGame } from '../game/PhaserGame';
 import { TouchControls } from '../components/TouchControls';
 import { EventBus } from '../game/EventBus';
 
 export const HomePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const spawnNear = (location.state as { from?: string } | null)?.from;
 
   useEffect(() => {
     const handleBuildingEntered = (buildingId: string) => {
@@ -26,7 +29,7 @@ export const HomePage = () => {
         <p>Walk to a building and press E or Enter to inspect</p>
       </header>
       <main className="game-wrapper">
-        <PhaserGame />
+        <PhaserGame spawnNear={spawnNear} />
         <TouchControls />
       </main>
     </div>

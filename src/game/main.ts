@@ -23,8 +23,12 @@ export const config: Phaser.Types.Core.GameConfig = {
   scene: [BootScene, WorldScene]
 };
 
-export const StartGame = (parent: string): Phaser.Game => {
-  return new Phaser.Game({ ...config, parent });
+export const StartGame = (parent: string, data?: { spawnNear?: string }): Phaser.Game => {
+  const game = new Phaser.Game({ ...config, parent });
+  if (data?.spawnNear) {
+    game.registry.set('spawnNear', data.spawnNear);
+  }
+  return game;
 };
 
 export default StartGame;

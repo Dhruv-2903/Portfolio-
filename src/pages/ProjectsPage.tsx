@@ -8,7 +8,7 @@ export const ProjectsPage: React.FC = () => {
       <div className="page-card page-card-large">
         <header className="page-header">
           <h2>FEATURED PROJECTS</h2>
-          <Link to="/" className="back-btn">
+          <Link to="/" state={{ from: 'projects' }} className="back-btn">
             ← BACK TO TOWN
           </Link>
         </header>

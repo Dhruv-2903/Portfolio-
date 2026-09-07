@@ -8,7 +8,7 @@ export const AboutPage: React.FC = () => {
       <div className="page-card">
         <header className="page-header">
           <h2>{aboutData.title}</h2>
-          <Link to="/" className="back-btn">
+          <Link to="/" state={{ from: 'about' }} className="back-btn">
             ← BACK TO TOWN
           </Link>
         </header>
