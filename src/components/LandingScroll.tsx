@@ -206,7 +206,7 @@ export const LandingScroll: React.FC<LandingScrollProps> = ({ onComplete }) => {
 
       {/* Tall Scrollable Container */}
       <div ref={containerRef} className="landing-scroll-container">
-        <div className="landing-sticky-wrapper">
+        <div className="landing-fixed-wrapper">
           <canvas ref={canvasRef} className="landing-canvas" />
 
           {/* Retro Scroll Indicator Prompt */}
