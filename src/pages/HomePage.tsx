@@ -1,14 +1,19 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PhaserGame } from '../game/PhaserGame';
 import { TouchControls } from '../components/TouchControls';
 import { EventBus } from '../game/EventBus';
+import LandingScroll from '../components/LandingScroll';
 
 export const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const spawnNear = (location.state as { from?: string } | null)?.from;
+
+  const [showLanding, setShowLanding] = useState<boolean>(() => {
+    return sessionStorage.getItem('landingSeen') !== 'true';
+  });
 
   useEffect(() => {
     const handleBuildingEntered = (buildingId: string) => {
@@ -21,6 +26,10 @@ export const HomePage = () => {
       EventBus.off('building-entered', handleBuildingEntered);
     };
   }, [navigate]);
+
+  if (showLanding) {
+    return <LandingScroll onComplete={() => setShowLanding(false)} />;
+  }
 
   return (
     <div className="app-container">
@@ -37,3 +46,4 @@ export const HomePage = () => {
 };
 
 export default HomePage;
+
