@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { preloadGameAssets } from '../utils/assetPreloader';
+import WelcomeOverlay from './WelcomeOverlay';
 
 interface LandingScrollProps {
   onComplete: () => void;
@@ -12,6 +13,7 @@ export const LandingScroll: React.FC<LandingScrollProps> = ({ onComplete }) => {
   const [isPreloaded, setIsPreloaded] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [hasScrolledPastTop, setHasScrolledPastTop] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -94,12 +96,15 @@ export const LandingScroll: React.FC<LandingScrollProps> = ({ onComplete }) => {
     currentFrameRef.current = index;
   }, []);
 
-  // Resize canvas to match window dimensions
+  // Resize canvas to match container client dimensions (excluding scrollbars)
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const parent = canvas.parentElement;
+    const width = parent ? parent.clientWidth : document.documentElement.clientWidth;
+    const height = parent ? parent.clientHeight : window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
 
     if (currentFrameRef.current >= 0) {
       drawFrame(currentFrameRef.current);
@@ -150,6 +155,12 @@ export const LandingScroll: React.FC<LandingScrollProps> = ({ onComplete }) => {
         if (totalScrollable <= 0) return;
 
         const scrollY = window.scrollY || window.pageYOffset;
+
+        // Fade out WelcomeOverlay once user moves scroll position above 0
+        if (scrollY > 5) {
+          setHasScrolledPastTop(true);
+        }
+
         const progress = Math.max(0, Math.min(1, scrollY / totalScrollable));
 
         const targetFrame = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * TOTAL_FRAMES));
@@ -208,6 +219,9 @@ export const LandingScroll: React.FC<LandingScrollProps> = ({ onComplete }) => {
       <div ref={containerRef} className="landing-scroll-container">
         <div className="landing-fixed-wrapper">
           <canvas ref={canvasRef} className="landing-canvas" />
+
+          {/* Welcome Overlay with Encrypted Text */}
+          <WelcomeOverlay isVisible={isPreloaded && !hasScrolledPastTop && !isTransitioning} />
 
           {/* Retro Scroll Indicator Prompt */}
           {isPreloaded && !isTransitioning && (
