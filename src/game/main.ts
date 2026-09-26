@@ -4,8 +4,8 @@ import { WorldScene } from './scenes/WorldScene';
 
 export const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 480,
-  height: 270,
+  width: window.innerWidth,
+  height: window.innerHeight,
   parent: 'game-container',
   pixelArt: true,
   roundPixels: true,

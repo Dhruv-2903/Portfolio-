@@ -1,24 +1,29 @@
 .app-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
   background-color: #0d0e15;
   color: #f0f0f0;
   font-family: 'Courier New', Courier, monospace;
-  padding: 1rem;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
 .app-header {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
   text-align: center;
-  margin-bottom: 1rem;
 }
 
 .app-header h1 {
-  font-size: 2rem;
-  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  margin: 0 0 0.25rem 0;
   color: #ffdd55;
   letter-spacing: 2px;
   text-shadow: 2px 2px 0px #000;
@@ -26,19 +31,18 @@
 
 .app-header p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #aaaaff;
+  text-shadow: 1px 1px 0px #000;
 }
 
 .game-wrapper {
   position: relative;
   width: 100%;
-  max-width: 960px;
-  aspect-ratio: 16 / 9;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
   background: #000;
-  border: 4px solid #333355;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -131,6 +135,7 @@
     opacity: 0;
     transform: scale(0.97);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -524,9 +529,12 @@
 }
 
 @keyframes bounceHint {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, 0);
   }
+
   50% {
     transform: translate(-50%, -10px);
   }
@@ -566,6 +574,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -643,10 +652,8 @@
     font-size: 1.5rem;
     letter-spacing: 1px;
   }
+
   .welcome-text-card {
     padding: 1.25rem 1.5rem;
   }
 }
-
-
-

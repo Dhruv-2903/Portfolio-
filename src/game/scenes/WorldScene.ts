@@ -3,7 +3,6 @@ import { EventBus } from '../EventBus';
 import { BUILDING_CONFIGS, BUILDING_ELEVATIONS, getSpawnX, getSpawnY } from '../buildingPositions';
 
 export class WorldScene extends Phaser.Scene {
-  private groundTile!: Phaser.GameObjects.TileSprite;
   public buildings: Phaser.GameObjects.Sprite[] = [];
   public player!: Phaser.Physics.Arcade.Sprite;
   private buildingGroup!: Phaser.Physics.Arcade.StaticGroup;
@@ -65,9 +64,14 @@ export class WorldScene extends Phaser.Scene {
     const groundHeight = 24;
     const groundY = worldHeight - groundHeight;
 
-    // Repeating ground tile stretched across full strip width
-    this.groundTile = this.add.tileSprite(0, groundY, worldWidth, groundHeight, 'ground');
-    this.groundTile.setOrigin(0, 0);
+    // Main Ground 9-slice tiles
+    const tileSize = 18;
+    this.add.image(0, groundY, 'tile_0021').setOrigin(0, 0);
+    this.add.tileSprite(tileSize, groundY, worldWidth - tileSize * 2, tileSize, 'tile_0022').setOrigin(0, 0);
+    this.add.image(worldWidth - tileSize, groundY, 'tile_0023').setOrigin(0, 0);
+
+    // All rows beneath top row (pure fill down past viewport)
+    this.add.tileSprite(0, groundY + tileSize, worldWidth, 200, 'tile_0122').setOrigin(0, 0);
 
     // Create a static physics body for the ground strip so player lands on top of groundY
     const groundBody = this.add.rectangle(worldWidth / 2, groundY + groundHeight / 2, worldWidth, groundHeight);
@@ -337,8 +341,57 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createPlatform(x: number, topY: number, width: number, height: number = 16) {
-    const platformTile = this.add.tileSprite(x, topY, width, height, 'ground');
-    platformTile.setOrigin(0.5, 0);
+    const leftX = x - width / 2;
+    const tileSize = 18;
+
+    if (width <= tileSize) {
+      // 1-tile wide platform
+      this.add.image(leftX, topY, 'tile_0020').setOrigin(0, 0);
+      if (height > tileSize * 2) {
+        this.add.tileSprite(leftX, topY + tileSize, tileSize, height - tileSize * 2, 'tile_0120').setOrigin(0, 0);
+        this.add.image(leftX, topY + height - tileSize, 'tile_0141').setOrigin(0, 0);
+      } else if (height > tileSize) {
+        this.add.image(leftX, topY + height - tileSize, 'tile_0141').setOrigin(0, 0);
+      }
+    } else {
+      // 2+ tiles wide platform
+      const midWidth = width - tileSize * 2;
+
+      // Top row: tile_0021 (leftmost) -> tile_0022 (repeated middle) -> tile_0023 (rightmost)
+      this.add.image(leftX, topY, 'tile_0021').setOrigin(0, 0);
+      if (midWidth > 0) {
+        this.add.tileSprite(leftX + tileSize, topY, midWidth, tileSize, 'tile_0022').setOrigin(0, 0);
+      }
+      this.add.image(leftX + width - tileSize, topY, 'tile_0023').setOrigin(0, 0);
+
+      if (height > tileSize * 2) {
+        const bodyHeight = height - tileSize * 2;
+        const bodyY = topY + tileSize;
+        const bottomY = topY + height - tileSize;
+
+        // Body rows: tile_0121 (leftmost) -> tile_0122 (repeated middle) -> tile_0123 (rightmost)
+        this.add.tileSprite(leftX, bodyY, tileSize, bodyHeight, 'tile_0121').setOrigin(0, 0);
+        if (midWidth > 0) {
+          this.add.tileSprite(leftX + tileSize, bodyY, midWidth, bodyHeight, 'tile_0122').setOrigin(0, 0);
+        }
+        this.add.tileSprite(leftX + width - tileSize, bodyY, tileSize, bodyHeight, 'tile_0123').setOrigin(0, 0);
+
+        // Bottom row: tile_0141 (leftmost) -> tile_0142 (repeated middle) -> tile_0143 (rightmost)
+        this.add.image(leftX, bottomY, 'tile_0141').setOrigin(0, 0);
+        if (midWidth > 0) {
+          this.add.tileSprite(leftX + tileSize, bottomY, midWidth, tileSize, 'tile_0142').setOrigin(0, 0);
+        }
+        this.add.image(leftX + width - tileSize, bottomY, 'tile_0143').setOrigin(0, 0);
+      } else if (height > tileSize) {
+        // Platform between 18px and 36px high: Top row + Bottom row
+        const bottomY = topY + height - tileSize;
+        this.add.image(leftX, bottomY, 'tile_0141').setOrigin(0, 0);
+        if (midWidth > 0) {
+          this.add.tileSprite(leftX + tileSize, bottomY, midWidth, tileSize, 'tile_0142').setOrigin(0, 0);
+        }
+        this.add.image(leftX + width - tileSize, bottomY, 'tile_0143').setOrigin(0, 0);
+      }
+    }
 
     const platformBody = this.add.rectangle(x, topY + height / 2, width, height);
     platformBody.setVisible(false);

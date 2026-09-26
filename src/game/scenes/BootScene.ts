@@ -63,6 +63,17 @@ export class BootScene extends Phaser.Scene {
 
     // Preload assets from /public/assets
     this.load.image('ground', '/assets/ground/ground-tile.png');
+    this.load.image('tile_0020', '/assets/ground/tile_0020.png');
+    this.load.image('tile_0021', '/assets/ground/tile_0021.png');
+    this.load.image('tile_0022', '/assets/ground/tile_0022.png');
+    this.load.image('tile_0023', '/assets/ground/tile_0023.png');
+    this.load.image('tile_0120', '/assets/ground/tile_0120.png');
+    this.load.image('tile_0121', '/assets/ground/tile_0121.png');
+    this.load.image('tile_0122', '/assets/ground/tile_0122.png');
+    this.load.image('tile_0123', '/assets/ground/tile_0123.png');
+    this.load.image('tile_0141', '/assets/ground/tile_0141.png');
+    this.load.image('tile_0142', '/assets/ground/tile_0142.png');
+    this.load.image('tile_0143', '/assets/ground/tile_0143.png');
     this.load.image('building-about', '/assets/buildings/Building1aboutnobg.png');
     this.load.image('building-skills', '/assets/buildings/Building2Skillsnobg.png');
     this.load.image('building-projects', '/assets/buildings/Building3Projectsnobg.png');
