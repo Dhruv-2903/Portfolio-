@@ -73,6 +73,9 @@ export class WorldScene extends Phaser.Scene {
     // All rows beneath top row (pure fill down past viewport)
     this.add.tileSprite(0, groundY + tileSize, worldWidth, 200, 'tile_0122').setOrigin(0, 0);
 
+    // Scatter trees and decorative props on open ground
+    this.createScatteredProps(groundY);
+
     // Create a static physics body for the ground strip so player lands on top of groundY
     const groundBody = this.add.rectangle(worldWidth / 2, groundY + groundHeight / 2, worldWidth, groundHeight);
     this.physics.add.existing(groundBody, true);
@@ -412,6 +415,102 @@ export class WorldScene extends Phaser.Scene {
     // 2-step staircase leading down/up to Contact (building at x = 2550, height ~50px above ground)
     this.createPlatform(2450, groundY - 25, 60, 25);
     this.createPlatform(2530, groundY - 50, 90, 50);
+  }
+
+  private createTree(x: number, groundY: number, trunkTilesCount: number = 3) {
+    const tileSize = 18;
+    const baseTrunkY = groundY - tileSize;
+
+    // Stack 2-3 trunk tiles vertically (zero collision)
+    this.add.image(x, baseTrunkY, 'tile_0137').setOrigin(0.5, 0);
+    this.add.image(x, baseTrunkY - tileSize, 'tile_0117').setOrigin(0.5, 0);
+
+    if (trunkTilesCount >= 3) {
+      this.add.image(x, baseTrunkY - tileSize * 2, 'tile_0118').setOrigin(0.5, 0);
+    }
+
+    const topTrunkY = baseTrunkY - tileSize * (trunkTilesCount - 1);
+
+    // Top canopy cluster (mixed tiles for fuller, rounded shape)
+    // Row 1 (top of canopy)
+    this.add.image(x - 9, topTrunkY - 36, 'tile_0008').setOrigin(0.5, 0);
+    this.add.image(x + 9, topTrunkY - 36, 'tile_0009').setOrigin(0.5, 0);
+
+    // Row 2 (middle of canopy)
+    this.add.image(x - 18, topTrunkY - 18, 'tile_0017').setOrigin(0.5, 0);
+    this.add.image(x, topTrunkY - 18, 'tile_0018').setOrigin(0.5, 0);
+    this.add.image(x + 18, topTrunkY - 18, 'tile_0019').setOrigin(0.5, 0);
+
+    // Row 3 (lower canopy)
+    this.add.image(x - 18, topTrunkY, 'tile_0037').setOrigin(0.5, 0);
+    this.add.image(x, topTrunkY, 'tile_0038').setOrigin(0.5, 0);
+    this.add.image(x + 18, topTrunkY, 'tile_0039').setOrigin(0.5, 0);
+  }
+
+  private createScatteredProps(groundY: number) {
+    // 4 Large Trees in open ground zones
+    this.createTree(220, groundY, 3);
+    this.createTree(760, groundY, 3);
+    this.createTree(1420, groundY, 3);
+    this.createTree(2150, groundY, 3);
+
+    // Bushes (tile_0096 - tile_0099)
+    const bushes = [
+      { x: 140, key: 'tile_0096' },
+      { x: 640, key: 'tile_0097' },
+      { x: 880, key: 'tile_0098' },
+      { x: 1310, key: 'tile_0099' },
+      { x: 1530, key: 'tile_0096' },
+      { x: 2040, key: 'tile_0097' },
+      { x: 2290, key: 'tile_0098' },
+      { x: 2760, key: 'tile_0099' }
+    ];
+    bushes.forEach((b) => {
+      this.add.image(b.x, groundY, b.key).setOrigin(0.5, 1);
+    });
+
+    // Grass tufts (tile_0124, tile_0125)
+    const grassTufts = [
+      { x: 90, key: 'tile_0124' },
+      { x: 280, key: 'tile_0125' },
+      { x: 590, key: 'tile_0124' },
+      { x: 830, key: 'tile_0125' },
+      { x: 1370, key: 'tile_0124' },
+      { x: 1480, key: 'tile_0125' },
+      { x: 1990, key: 'tile_0124' },
+      { x: 2230, key: 'tile_0125' },
+      { x: 2710, key: 'tile_0124' },
+      { x: 2950, key: 'tile_0125' }
+    ];
+    grassTufts.forEach((g) => {
+      this.add.image(g.x, groundY, g.key).setOrigin(0.5, 1);
+    });
+
+    // Rocks (tile_0068, tile_0069)
+    const rocks = [
+      { x: 170, key: 'tile_0068' },
+      { x: 700, key: 'tile_0069' },
+      { x: 1500, key: 'tile_0068' },
+      { x: 2090, key: 'tile_0069' },
+      { x: 2800, key: 'tile_0068' }
+    ];
+    rocks.forEach((r) => {
+      this.add.image(r.x, groundY, r.key).setOrigin(0.5, 1);
+    });
+
+    // Fence segment (tile_0105)
+    this.add.image(670, groundY, 'tile_0105').setOrigin(0.5, 1);
+
+    // Wooden signs (tile_0084 - tile_0089)
+    const signs = [
+      { x: 310, key: 'tile_0087' },
+      { x: 920, key: 'tile_0085' },
+      { x: 1570, key: 'tile_0084' },
+      { x: 2330, key: 'tile_0086' }
+    ];
+    signs.forEach((s) => {
+      this.add.image(s.x, groundY, s.key).setOrigin(0.5, 1);
+    });
   }
 }
 
