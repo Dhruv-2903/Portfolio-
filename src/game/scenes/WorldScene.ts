@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { EventBus } from '../EventBus';
-import { BUILDING_CONFIGS, BUILDING_ELEVATIONS, getSpawnX, getSpawnY } from '../buildingPositions';
+import { BUILDING_CONFIGS, BUILDING_ELEVATIONS, BUILDING_POSITIONS, getSpawnX, getSpawnY } from '../buildingPositions';
 
 export class WorldScene extends Phaser.Scene {
   public buildings: Phaser.GameObjects.Sprite[] = [];
@@ -36,7 +36,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   create() {
-    const worldWidth = 3200;
+    const worldWidth = 6500;
     const worldHeight = 270;
     const minY = -250;
     const totalHeight = worldHeight - minY;
@@ -70,8 +70,8 @@ export class WorldScene extends Phaser.Scene {
     this.add.tileSprite(tileSize, groundY, worldWidth - tileSize * 2, tileSize, 'tile_0022').setOrigin(0, 0);
     this.add.image(worldWidth - tileSize, groundY, 'tile_0023').setOrigin(0, 0);
 
-    // All rows beneath top row (pure fill down past viewport)
-    this.add.tileSprite(0, groundY + tileSize, worldWidth, 200, 'tile_0122').setOrigin(0, 0);
+    // All rows beneath top row (pure fill down past viewport - extended height to prevent bottom black void)
+    this.add.tileSprite(0, groundY + tileSize, worldWidth, 2000, 'tile_0122').setOrigin(0, 0);
 
     // Scatter trees and decorative props on open ground
     this.createScatteredProps(groundY);
@@ -403,18 +403,22 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createPlatforms(groundY: number) {
-    // 2-step staircase leading up to Skills (building at x = 1150, height ~60px above ground)
-    this.createPlatform(1030, groundY - 30, 60, 30);
-    this.createPlatform(1110, groundY - 60, 100, 60);
+    const skillsX = BUILDING_POSITIONS.skills || 2300;
+    const projectsX = BUILDING_POSITIONS.projects || 3900;
+    const contactX = BUILDING_POSITIONS.contact || 5500;
 
-    // 3-step ascending jump-chain leading up to Projects (building at x = 1850, height ~120px above ground)
-    this.createPlatform(1670, groundY - 40, 50, 16);
-    this.createPlatform(1740, groundY - 80, 50, 16);
-    this.createPlatform(1830, groundY - 120, 90, 16);
+    // 2-step staircase leading up to Skills
+    this.createPlatform(skillsX - 120, groundY - 30, 60, 30);
+    this.createPlatform(skillsX - 40, groundY - 60, 100, 60);
 
-    // 2-step staircase leading down/up to Contact (building at x = 2550, height ~50px above ground)
-    this.createPlatform(2450, groundY - 25, 60, 25);
-    this.createPlatform(2530, groundY - 50, 90, 50);
+    // 3-step ascending jump-chain leading up to Projects
+    this.createPlatform(projectsX - 180, groundY - 40, 50, 16);
+    this.createPlatform(projectsX - 110, groundY - 80, 50, 16);
+    this.createPlatform(projectsX - 20, groundY - 120, 90, 16);
+
+    // 2-step staircase leading down/up to Contact
+    this.createPlatform(contactX - 100, groundY - 25, 60, 25);
+    this.createPlatform(contactX - 20, groundY - 50, 90, 50);
   }
 
   private createTree(x: number, groundY: number, trunkTilesCount: number = 3) {
@@ -448,22 +452,24 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createScatteredProps(groundY: number) {
-    // 4 Large Trees in open ground zones
-    this.createTree(220, groundY, 3);
-    this.createTree(760, groundY, 3);
-    this.createTree(1420, groundY, 3);
-    this.createTree(2150, groundY, 3);
+    // Large Trees placed in open ground zones across 6500px world
+    const treePositions = [350, 1180, 1750, 2750, 3320, 4350, 4920, 5950];
+    treePositions.forEach((x) => this.createTree(x, groundY, 3));
 
     // Bushes (tile_0096 - tile_0099)
     const bushes = [
-      { x: 140, key: 'tile_0096' },
-      { x: 640, key: 'tile_0097' },
-      { x: 880, key: 'tile_0098' },
-      { x: 1310, key: 'tile_0099' },
-      { x: 1530, key: 'tile_0096' },
-      { x: 2040, key: 'tile_0097' },
-      { x: 2290, key: 'tile_0098' },
-      { x: 2760, key: 'tile_0099' }
+      { x: 220, key: 'tile_0096' },
+      { x: 980, key: 'tile_0097' },
+      { x: 1450, key: 'tile_0098' },
+      { x: 1880, key: 'tile_0099' },
+      { x: 2550, key: 'tile_0096' },
+      { x: 3020, key: 'tile_0097' },
+      { x: 3480, key: 'tile_0098' },
+      { x: 4150, key: 'tile_0099' },
+      { x: 4620, key: 'tile_0096' },
+      { x: 5080, key: 'tile_0097' },
+      { x: 5750, key: 'tile_0098' },
+      { x: 6200, key: 'tile_0099' }
     ];
     bushes.forEach((b) => {
       this.add.image(b.x, groundY, b.key).setOrigin(0.5, 1);
@@ -471,16 +477,22 @@ export class WorldScene extends Phaser.Scene {
 
     // Grass tufts (tile_0124, tile_0125)
     const grassTufts = [
-      { x: 90, key: 'tile_0124' },
-      { x: 280, key: 'tile_0125' },
-      { x: 590, key: 'tile_0124' },
-      { x: 830, key: 'tile_0125' },
-      { x: 1370, key: 'tile_0124' },
-      { x: 1480, key: 'tile_0125' },
-      { x: 1990, key: 'tile_0124' },
-      { x: 2230, key: 'tile_0125' },
-      { x: 2710, key: 'tile_0124' },
-      { x: 2950, key: 'tile_0125' }
+      { x: 120, key: 'tile_0124' },
+      { x: 440, key: 'tile_0125' },
+      { x: 920, key: 'tile_0124' },
+      { x: 1280, key: 'tile_0125' },
+      { x: 1540, key: 'tile_0124' },
+      { x: 1960, key: 'tile_0125' },
+      { x: 2490, key: 'tile_0124' },
+      { x: 2850, key: 'tile_0125' },
+      { x: 3110, key: 'tile_0124' },
+      { x: 3550, key: 'tile_0125' },
+      { x: 4090, key: 'tile_0124' },
+      { x: 4450, key: 'tile_0125' },
+      { x: 4710, key: 'tile_0124' },
+      { x: 5150, key: 'tile_0125' },
+      { x: 5680, key: 'tile_0124' },
+      { x: 6080, key: 'tile_0125' }
     ];
     grassTufts.forEach((g) => {
       this.add.image(g.x, groundY, g.key).setOrigin(0.5, 1);
@@ -488,25 +500,29 @@ export class WorldScene extends Phaser.Scene {
 
     // Rocks (tile_0068, tile_0069)
     const rocks = [
-      { x: 170, key: 'tile_0068' },
-      { x: 700, key: 'tile_0069' },
-      { x: 1500, key: 'tile_0068' },
-      { x: 2090, key: 'tile_0069' },
-      { x: 2800, key: 'tile_0068' }
+      { x: 270, key: 'tile_0068' },
+      { x: 1100, key: 'tile_0069' },
+      { x: 1620, key: 'tile_0068' },
+      { x: 2660, key: 'tile_0069' },
+      { x: 3180, key: 'tile_0068' },
+      { x: 4260, key: 'tile_0069' },
+      { x: 4780, key: 'tile_0068' },
+      { x: 5850, key: 'tile_0069' },
+      { x: 6300, key: 'tile_0068' }
     ];
     rocks.forEach((r) => {
       this.add.image(r.x, groundY, r.key).setOrigin(0.5, 1);
     });
 
     // Fence segment (tile_0105)
-    this.add.image(670, groundY, 'tile_0105').setOrigin(0.5, 1);
+    this.add.image(1350, groundY, 'tile_0105').setOrigin(0.5, 1);
 
     // Wooden signs (tile_0084 - tile_0089)
     const signs = [
-      { x: 310, key: 'tile_0087' },
-      { x: 920, key: 'tile_0085' },
-      { x: 1570, key: 'tile_0084' },
-      { x: 2330, key: 'tile_0086' }
+      { x: 520, key: 'tile_0087' },
+      { x: 2050, key: 'tile_0085' },
+      { x: 3620, key: 'tile_0084' },
+      { x: 5300, key: 'tile_0086' }
     ];
     signs.forEach((s) => {
       this.add.image(s.x, groundY, s.key).setOrigin(0.5, 1);
