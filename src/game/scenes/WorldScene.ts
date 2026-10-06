@@ -435,20 +435,21 @@ export class WorldScene extends Phaser.Scene {
 
     const topTrunkY = baseTrunkY - tileSize * (trunkTilesCount - 1);
 
-    // Top canopy cluster (mixed tiles for fuller, rounded shape)
+    // Top canopy cluster (rebuilt using confirmed green foliage tiles)
     // Row 1 (top of canopy)
-    this.add.image(x - 9, topTrunkY - 36, 'tile_0008').setOrigin(0.5, 0);
-    this.add.image(x + 9, topTrunkY - 36, 'tile_0009').setOrigin(0.5, 0);
+    this.add.image(x - 18, topTrunkY - 36, 'tile_0017').setOrigin(0.5, 0);
+    this.add.image(x, topTrunkY - 36, 'tile_0018').setOrigin(0.5, 0);
+    this.add.image(x + 18, topTrunkY - 36, 'tile_0019').setOrigin(0.5, 0);
 
     // Row 2 (middle of canopy)
-    this.add.image(x - 18, topTrunkY - 18, 'tile_0017').setOrigin(0.5, 0);
-    this.add.image(x, topTrunkY - 18, 'tile_0018').setOrigin(0.5, 0);
-    this.add.image(x + 18, topTrunkY - 18, 'tile_0019').setOrigin(0.5, 0);
+    this.add.image(x - 18, topTrunkY - 18, 'tile_0037').setOrigin(0.5, 0);
+    this.add.image(x, topTrunkY - 18, 'tile_0038').setOrigin(0.5, 0);
+    this.add.image(x + 18, topTrunkY - 18, 'tile_0039').setOrigin(0.5, 0);
 
     // Row 3 (lower canopy)
-    this.add.image(x - 18, topTrunkY, 'tile_0037').setOrigin(0.5, 0);
-    this.add.image(x, topTrunkY, 'tile_0038').setOrigin(0.5, 0);
-    this.add.image(x + 18, topTrunkY, 'tile_0039').setOrigin(0.5, 0);
+    this.add.image(x - 18, topTrunkY, 'tile_0057').setOrigin(0.5, 0);
+    this.add.image(x, topTrunkY, 'tile_0058').setOrigin(0.5, 0);
+    this.add.image(x + 18, topTrunkY, 'tile_0059').setOrigin(0.5, 0);
   }
 
   private createScatteredProps(groundY: number) {

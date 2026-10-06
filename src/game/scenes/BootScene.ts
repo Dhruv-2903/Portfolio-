@@ -63,8 +63,6 @@ export class BootScene extends Phaser.Scene {
 
     // Preload assets from /public/assets
     this.load.image('ground', '/assets/ground/ground-tile.png');
-    this.load.image('tile_0008', '/assets/ground/tile_0008.png');
-    this.load.image('tile_0009', '/assets/ground/tile_0009.png');
     this.load.image('tile_0017', '/assets/ground/tile_0017.png');
     this.load.image('tile_0018', '/assets/ground/tile_0018.png');
     this.load.image('tile_0019', '/assets/ground/tile_0019.png');

@@ -1,7 +1,5 @@
 const GAME_ASSET_URLS = [
   '/assets/ground/ground-tile.png',
-  '/assets/ground/tile_0008.png',
-  '/assets/ground/tile_0009.png',
   '/assets/ground/tile_0017.png',
   '/assets/ground/tile_0018.png',
   '/assets/ground/tile_0019.png',
