@@ -135,11 +135,12 @@
 /* Full Viewport Page Layout & Content Outlined Cards */
 .page-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
   background-color: #000000;
-  padding: clamp(0.75rem, 3vw, 2.5rem);
+  padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 2.5rem);
   box-sizing: border-box;
   font-family: var(--font-source-code-pro);
   font-feature-settings: "zero" 1;
@@ -156,25 +157,16 @@
   }
 }
 
-.page-card {
-  background: #000000;
-  border: 1px solid #ffffff;
-  border-radius: 15px;
-  padding: clamp(1rem, 4vw, 2.25rem);
-  width: clamp(280px, 92vw, 680px);
-  max-width: 100%;
-  max-height: calc(100vh - 2 * clamp(0.75rem, 3vw, 2.5rem));
-  overflow-y: auto;
-  overflow-x: hidden;
-  color: #ffffff;
-  font-family: var(--font-source-code-pro);
-  animation: fadeIn 0.2s ease-out;
+/* Full-Width Max 1200px Content Wrapper */
+.page-content-wrapper {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   box-sizing: border-box;
-}
-
-.page-card.page-card-large {
-  width: clamp(280px, 92vw, 1100px);
-  max-width: 100%;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .page-header {
@@ -182,20 +174,20 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #333333;
-  padding-bottom: clamp(0.75rem, 2vw, 1.25rem);
-  margin-bottom: clamp(1rem, 3vw, 1.75rem);
-  gap: clamp(0.75rem, 2vw, 1.5rem);
+  padding-bottom: clamp(1rem, 2.5vw, 1.5rem);
+  gap: clamp(1rem, 3vw, 2rem);
   flex-wrap: wrap;
+  width: 100%;
 }
 
-/* Fluid Section Headings: Source Code Pro, uppercase, fluid font-size 20px -> 42px, fluid letter-spacing */
+/* Fluid Section Headings: Source Code Pro, uppercase, fluid font-size 24px -> 42px, fluid letter-spacing */
 .page-header h2 {
   margin: 0;
   font-family: var(--font-source-code-pro);
-  font-size: clamp(1.25rem, 4.2vw, 2.625rem);
+  font-size: clamp(1.5rem, 5vw, 2.625rem);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: clamp(0.12em, 1.2vw, 0.4em);
+  letter-spacing: clamp(0.15em, 1.5vw, 0.4em);
   line-height: 1.19;
   color: #ffffff;
   word-break: break-word;
@@ -209,12 +201,12 @@
   background: transparent;
   color: #ffffff;
   border: 1px solid #ffffff;
-  font-size: clamp(0.7rem, 1.1vw, 0.8rem);
+  font-size: clamp(0.7rem, 1.2vw, 0.75rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   text-decoration: none;
-  padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 16px);
+  padding: clamp(8px, 1.5vw, 12px) clamp(14px, 2vw, 20px);
   font-family: var(--font-source-code-pro);
   border-radius: 10px;
   min-height: 44px;
@@ -233,14 +225,27 @@
 .page-body {
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 3vw, 1.75rem);
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   font-family: var(--font-source-code-pro);
+  width: 100%;
+}
+
+/* About Page Hero & Highlights Grid */
+.about-hero-card {
+  background: #29292a;
+  border: 1px solid #ffffff;
+  border-radius: 15px;
+  padding: clamp(1.25rem, 3.5vw, 2.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  box-sizing: border-box;
 }
 
 .profile-header h3 {
   margin: 0 0 0.3rem 0;
   color: #ffffff;
-  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-size: clamp(1.4rem, 3.5vw, 2.2rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -249,7 +254,7 @@
 .profile-header .role {
   margin: 0;
   color: #ee1f66;
-  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -258,36 +263,51 @@
 .bio {
   line-height: 1.88;
   color: #ffffff;
-  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
   margin: 0;
 }
 
-.highlights h4,
-.skill-group h4 {
+.section-subtitle {
   color: #ffffff;
-  margin: 0 0 0.75rem 0;
-  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  margin: 0 0 clamp(0.75rem, 2vw, 1.25rem) 0;
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
 
-.highlights ul {
-  margin: 0;
-  padding-left: 1.2rem;
+.highlights-section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
 
-.highlights li {
-  line-height: 1.6;
-  color: #a0a0a0;
-  font-size: clamp(0.8rem, 1.3vw, 0.9rem);
+.highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  width: 100%;
 }
 
-.skill-group {
-  margin-bottom: 0.5rem;
+.highlight-card {
+  background: #29292a;
+  border: 1px solid #ffffff;
+  border-radius: 15px;
+  padding: clamp(1rem, 2.5vw, 1.35rem);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-sizing: border-box;
+}
+
+.highlight-card .bullet {
+  color: #ee1f66;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+}
+
+.highlight-card .highlight-text {
+  color: #ffffff;
+  font-size: clamp(0.85rem, 1.6vw, 0.95rem);
+  line-height: 1.5;
 }
 
 .tags-container {
@@ -301,7 +321,7 @@
   border: 1px solid #ffffff;
   color: #ffffff;
   padding: 4px clamp(6px, 1.2vw, 10px);
-  font-size: clamp(0.7rem, 1vw, 0.8rem);
+  font-size: clamp(0.7rem, 1.1vw, 0.8rem);
   font-weight: 600;
   border-radius: 6px;
   text-transform: uppercase;
@@ -309,31 +329,33 @@
 }
 
 .pixel-tag.mini {
-  font-size: clamp(0.68rem, 0.95vw, 0.75rem);
+  font-size: clamp(0.68rem, 1vw, 0.75rem);
   padding: 3px clamp(5px, 1vw, 8px);
 }
 
-.projects-list {
+/* Projects Page 1200px Multi-Column Grid */
+.projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: clamp(1rem, 2.5vw, 1.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: clamp(1.25rem, 3vw, 2rem);
+  width: 100%;
 }
 
 .project-card {
   background: #29292a;
   border: 1px solid #ffffff;
   border-radius: 15px;
-  padding: clamp(1rem, 2.5vw, 1.35rem);
+  padding: clamp(1.25rem, 3vw, 1.75rem);
   display: flex;
   flex-direction: column;
-  gap: clamp(0.5rem, 1.5vw, 0.8rem);
+  gap: clamp(0.75rem, 2vw, 1rem);
   box-sizing: border-box;
 }
 
 .project-card h3 {
   margin: 0;
   color: #ffffff;
-  font-size: clamp(1rem, 2vw, 1.15rem);
+  font-size: clamp(1.1rem, 2.5vw, 1.35rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -342,7 +364,7 @@
 
 .project-card p {
   margin: 0;
-  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  font-size: clamp(0.85rem, 1.6vw, 0.95rem);
   line-height: 1.7;
   color: #a0a0a0;
 }
@@ -363,7 +385,7 @@
   background: transparent;
   color: #ffffff;
   border: 1px solid #ffffff;
-  padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 16px);
+  padding: clamp(8px, 1.5vw, 10px) clamp(14px, 2vw, 18px);
   font-size: clamp(0.7rem, 1.1vw, 0.8rem);
   font-weight: 700;
   text-transform: uppercase;
@@ -396,17 +418,19 @@
   color: #ffffff;
 }
 
-.contact-list {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(0.75rem, 2vw, 1rem);
-}
-
+/* Contact Page Layout & Grid */
 .contact-intro {
-  margin: 0 0 0.5rem 0;
-  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  margin: 0 0 clamp(0.5rem, 1.5vw, 1rem) 0;
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
   color: #a0a0a0;
   line-height: 1.6;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  width: 100%;
 }
 
 .contact-card {
@@ -416,7 +440,7 @@
   flex-wrap: wrap;
   background: #29292a;
   border: 1px solid #ffffff;
-  padding: clamp(0.75rem, 2.5vw, 1.15rem) clamp(0.85rem, 3vw, 1.5rem);
+  padding: clamp(1rem, 2.5vw, 1.35rem) clamp(1.15rem, 3vw, 1.75rem);
   border-radius: 15px;
   color: #ffffff;
   text-decoration: none;
@@ -436,21 +460,87 @@
   color: #ee1f66;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
 }
 
 .contact-card .link-label {
   color: #ffffff;
-  font-size: clamp(0.8rem, 1.4vw, 0.9rem);
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
   word-break: break-all;
 }
 
-/* Ensure images and media inside page cards scale fluidly */
-.page-card img,
-.page-card video,
-.page-card svg,
-.page-card iframe {
+/* Skills Page Full-Width Category Grid */
+.skills-book-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.skills-category-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: clamp(1rem, 3vw, 2rem);
+}
+
+.skills-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(1.25rem, 3vw, 1.75rem);
+  width: 100%;
+}
+
+.skills-category-card {
+  background: #29292a;
+  border: 1px solid #ffffff;
+  border-radius: 15px;
+  padding: clamp(1.25rem, 3vw, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2vw, 1rem);
+  box-sizing: border-box;
+}
+
+.skills-category-card .category-title {
+  margin: 0;
+  color: #ee1f66;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.category-skills-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.category-skills-list li {
+  color: #ffffff;
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-source-code-pro);
+}
+
+.category-skills-list .bullet {
+  color: #ee1f66;
+  font-size: 0.7rem;
+}
+
+/* Ensure images and media inside page containers scale fluidly */
+.page-container img,
+.page-container video,
+.page-container svg,
+.page-container iframe {
   max-width: 100%;
+  height: auto;
 }
 
 /* Skills Page Book Layout */

@@ -5,7 +5,7 @@ import { aboutData } from '../data/content';
 export const AboutPage: React.FC = () => {
   return (
     <div className="page-container">
-      <div className="page-card">
+      <div className="page-content-wrapper">
         <header className="page-header">
           <h2>
             <span className="heading-pink">{aboutData.title.split(' ')[0]}</span>{' '}
@@ -15,19 +15,28 @@ export const AboutPage: React.FC = () => {
             ← BACK TO TOWN
           </Link>
         </header>
+
         <main className="page-body">
-          <div className="profile-header">
-            <h3>{aboutData.name}</h3>
-            <p className="role">{aboutData.role}</p>
+          {/* Main Hero Profile Card */}
+          <div className="about-hero-card">
+            <div className="profile-header">
+              <h3>{aboutData.name}</h3>
+              <p className="role">{aboutData.role}</p>
+            </div>
+            <p className="bio">{aboutData.bio}</p>
           </div>
-          <p className="bio">{aboutData.bio}</p>
-          <div className="highlights">
-            <h4>HIGHLIGHTS</h4>
-            <ul>
+
+          {/* Highlights Section as Full-Width Grid */}
+          <div className="highlights-section">
+            <h4 className="section-subtitle">KEY HIGHLIGHTS</h4>
+            <div className="highlights-grid">
               {aboutData.highlights.map((item, idx) => (
-                <li key={idx}>{item}</li>
+                <div key={idx} className="highlight-card">
+                  <span className="bullet">▶</span>
+                  <span className="highlight-text">{item}</span>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </main>
       </div>
