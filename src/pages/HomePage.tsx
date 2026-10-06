@@ -34,7 +34,7 @@ export const HomePage = () => {
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1>PIXEL PORTFOLIO</h1>
+        <h1><span className="accent-word">PIXEL</span> PORTFOLIO</h1>
         <p>Walk to a building and press E or Enter to inspect</p>
       </header>
       <main className="game-wrapper">

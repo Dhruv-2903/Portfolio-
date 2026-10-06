@@ -7,7 +7,10 @@ export const AboutPage: React.FC = () => {
     <div className="page-container">
       <div className="page-card">
         <header className="page-header">
-          <h2>{aboutData.title}</h2>
+          <h2>
+            <span className="heading-pink">{aboutData.title.split(' ')[0]}</span>{' '}
+            <span className="heading-white">{aboutData.title.split(' ').slice(1).join(' ')}</span>
+          </h2>
           <Link to="/" state={{ from: 'about' }} className="back-btn">
             ← BACK TO TOWN
           </Link>

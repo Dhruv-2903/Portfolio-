@@ -6,7 +6,10 @@ export const SkillsPage: React.FC = () => {
   return (
     <div className="page-container skills-page-container">
       <header className="page-header nav-bar">
-        <h2>SKILLS DIRECTORY</h2>
+        <h2>
+          <span className="heading-pink">SKILLS</span>{' '}
+          <span className="heading-white">DIRECTORY</span>
+        </h2>
         <Link to="/" state={{ from: 'skills' }} className="back-btn">
           ← BACK TO TOWN
         </Link>

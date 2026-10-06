@@ -7,7 +7,10 @@ export const ProjectsPage: React.FC = () => {
     <div className="page-container">
       <div className="page-card page-card-large">
         <header className="page-header">
-          <h2>FEATURED PROJECTS</h2>
+        <h2>
+          <span className="heading-pink">FEATURED</span>{' '}
+          <span className="heading-white">PROJECTS</span>
+        </h2>
           <Link to="/" state={{ from: 'projects' }} className="back-btn">
             ← BACK TO TOWN
           </Link>

@@ -66,8 +66,8 @@ export const LandingScroll: React.FC<LandingScrollProps> = ({ onComplete }) => {
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
 
-    // Fill background (dark retro theme)
-    ctx.fillStyle = '#0d0e15';
+    // Fill background (pure black canvas)
+    ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     const imgWidth = img.naturalWidth || 1920;
@@ -202,7 +202,7 @@ export const LandingScroll: React.FC<LandingScrollProps> = ({ onComplete }) => {
       {!isPreloaded && (
         <div className="landing-preload-overlay">
           <div className="landing-preload-card">
-            <h2 className="pixel-title">PIXEL PORTFOLIO</h2>
+            <h2 className="pixel-title"><span className="accent-word">PIXEL</span> PORTFOLIO</h2>
             <div className="pixel-subtext">INITIALIZING SCROLL EXPERIENCE...</div>
             <div className="landing-progress-bar-container">
               <div
@@ -236,7 +236,7 @@ export const LandingScroll: React.FC<LandingScrollProps> = ({ onComplete }) => {
             <div className="landing-transition-overlay">
               <div className="landing-transition-content">
                 <div className="pixel-spinner" />
-                <h3 className="transition-title">LOADING WORLD...</h3>
+                <h3 className="transition-title"><span className="accent-word">LOADING</span> WORLD...</h3>
                 <p className="transition-subtitle">Preparing Retro Neighborhood</p>
               </div>
             </div>

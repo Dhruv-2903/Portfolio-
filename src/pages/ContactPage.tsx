@@ -7,7 +7,10 @@ export const ContactPage: React.FC = () => {
     <div className="page-container">
       <div className="page-card">
         <header className="page-header">
-          <h2>GET IN TOUCH</h2>
+        <h2>
+          <span className="heading-pink">GET</span>{' '}
+          <span className="heading-white">IN TOUCH</span>
+        </h2>
           <Link to="/" state={{ from: 'contact' }} className="back-btn">
             ← BACK TO TOWN
           </Link>

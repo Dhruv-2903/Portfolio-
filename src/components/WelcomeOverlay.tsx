@@ -11,9 +11,15 @@ export const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ isVisible }) => 
       <div className="welcome-text-card">
         <h1 className="welcome-encrypted-heading">
           <EncryptedText
-            text="Welcome Back, kid"
+            text="WELCOME "
             encryptedClassName="encrypted-text-scrambled"
-            revealedClassName="encrypted-text-revealed"
+            revealedClassName="encrypted-text-pink"
+            revealDelayMs={60}
+          />
+          <EncryptedText
+            text="BACK, KID"
+            encryptedClassName="encrypted-text-scrambled"
+            revealedClassName="encrypted-text-white"
             revealDelayMs={60}
           />
         </h1>
